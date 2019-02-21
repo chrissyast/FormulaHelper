@@ -42,7 +42,7 @@ public class SimplifierGUI  {
          {
           final String formula = textArea.getText();
         }
-        else String f
+        else String fudge
 
         ActionListener yesListener = new ActionListener() {
             @Override
