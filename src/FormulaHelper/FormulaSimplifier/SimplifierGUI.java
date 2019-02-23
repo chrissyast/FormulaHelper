@@ -11,7 +11,13 @@ import java.awt.event.KeyListener;
 
 import static FormulaSimplifier.FormulaCode.*;
 
+
 public class SimplifierGUI  {
+
+    public static JLabel questionLabel = new JLabel();
+    public static JButton yesButton = new JButton("Yes");
+    public static JButton noButton = new JButton("No");
+    public static JTextArea textArea = new JTextArea(10, 40);
 
     public static void main(String[] args) {
 
@@ -19,21 +25,20 @@ public class SimplifierGUI  {
         JPanel yesNoPanel = new JPanel();
         f.setSize(500, 500);
         f.setLocation(300,200);
-        final JButton yesButton = new JButton("Yes");
 
 
-
-        final JButton noButton = new JButton("No");
+        yesButton.setVisible(false);
+        noButton.setVisible(false);
         yesNoPanel.add(yesButton);
         yesNoPanel.add(noButton);
 
         JPanel questionsAndAnswers  = new JPanel();
 
-        final JTextArea textArea = new JTextArea(10, 40);
+
         textArea.setEditable(true);
         f.add(BorderLayout.WEST, yesNoPanel);
         f.add(BorderLayout.CENTER, questionsAndAnswers);
-        final JLabel questionLabel = new JLabel();
+
         questionsAndAnswers.add(questionLabel);
         questionsAndAnswers.add(textArea);
         questionLabel.setText("What is the formula?");
@@ -42,14 +47,14 @@ public class SimplifierGUI  {
          {
           final String formula = textArea.getText();
         }
-        else String fudge
+
 
         ActionListener yesListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-      //          String formula = textArea.getText();
+                String formula = textArea.getText();
                 int i = StringUtils.countMatches(formula, "?");
-               if  (i>0) {
+                if (i > 1) {
                     String newFormula = "";
                     newFormula = findTrue(formula);
                     questionLabel.setText(askQuestion(newFormula));
@@ -62,7 +67,7 @@ public class SimplifierGUI  {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     //int i = StringUtils.countMatches(formula, "?");
-                    findFalse(formula);
+                    //         findFalse(formula);
                 }};
 
 
@@ -80,12 +85,14 @@ public class SimplifierGUI  {
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_ENTER) {
                     String formula = textArea.getText();
-                    if(!FormulaCode.checkColonsAndQuestionMarks(formula)) {
+                    analyse(formula);
+
+                 /*   if(!FormulaCode.checkColonsAndQuestionMarks(formula)) {
                         validateColonsAndQuestionMarks(formula);
                     }
                         textArea.setVisible(false);
                         questionLabel.setText(FormulaCode.askQuestion(textArea.getText()));
-
+*/
 
                 }
             }
@@ -103,6 +110,12 @@ public class SimplifierGUI  {
 
 
         f.setVisible(true);
+
+    }
+
+    public static void setQuestionText(String message) {
+
+        questionLabel.setText(message);
 
     }
 

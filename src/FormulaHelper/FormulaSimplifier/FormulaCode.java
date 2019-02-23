@@ -9,46 +9,54 @@ package FormulaSimplifier;
 import org.apache.commons.lang3.StringUtils;
 import java.util.Scanner;
 
+import static FormulaSimplifier.SimplifierGUI.*;
+
+
 public class FormulaCode {
 
-    /**
-     * @param args the command line arguments
-     */
+
+    public static void analyse(String formula) {
+
+        if (checkColonsAndQuestionMarks(formula)) {
+
+            textArea.setVisible(false);
+            yesButton.setVisible(true);
+            noButton.setVisible(true);
+            setQuestionText("You passed validation");
+        }
+    }
+
+
 
     public static boolean checkColonsAndQuestionMarks (String formula) {
 
         int i = StringUtils.countMatches(formula, "?");
         int j = StringUtils.countMatches(formula, ":");
 
-        if (i != j) {
-            System.out.println("There is an uneven number of colons and question marks. Please double check your formula");
-            System.out.println("Press enter to continue...");
-            return false;
-        }
+        if (i != j || (formula.indexOf(":") < formula.indexOf("?"))) {
+            StringBuilder validationMessage = new StringBuilder("Please double check your formula\n");
 
-        if (formula.indexOf(":") < formula.indexOf("?")) {
-            System.out.println("The first colon comes before the first question mark. Please double check your formula");
-            System.out.println("Press enter to continue...");
+            if (i != j) {
+                validationMessage.append("There is an uneven number of colons and question marks\n");
+
+            }
+
+            if (formula.indexOf(":") < formula.indexOf("?")) {
+                validationMessage.append("The first colon comes before the first question mark. Please double check your formula\n");
+
+            }
+            questionLabel.setText(validationMessage.toString());
             return false;
         }
         return true;
     }
 
 
-    public static String validateColonsAndQuestionMarks(String formula){
-        int i = StringUtils.countMatches(formula, "?");
-        int j = StringUtils.countMatches(formula, ":");
-        StringBuilder validationMessage = new StringBuilder();
+    public boolean areThereStillQuestionMarks(String formula) {
 
-        if (i != j) {
-            validationMessage.append("There is an uneven number of colons and question marks. Please double check your formula");
-        }
-
-        if (formula.indexOf(":") < formula.indexOf("?")) {
-            validationMessage.append("The first colon comes before the first question mark. Please double check your formula");
-        }
-
-        return validationMessage.toString();
+        if (StringUtils.countMatches(formula, "?") > 1) {
+            return true;
+        } else return false;
     }
 
     public static void main(String[] args) {
