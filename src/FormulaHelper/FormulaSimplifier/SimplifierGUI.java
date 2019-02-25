@@ -57,9 +57,9 @@ public class SimplifierGUI  {
                 if (i > 1) {
                     String newFormula = "";
                     newFormula = findTrue(formula);
-                    questionLabel.setText(askQuestion(newFormula));
+                    //questionLabel.setText(askQuestion(newFormula));  //TODO commented out just to test a different part
                 }
-               else {questionLabel.setText("The formula will return" + findTrue(formula));}
+               else {questionLabel.setText("The formula will return " + findTrue(formula));}
             }};
 
 

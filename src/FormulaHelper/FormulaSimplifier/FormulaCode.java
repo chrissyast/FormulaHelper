@@ -22,7 +22,7 @@ public class FormulaCode {
             textArea.setVisible(false);
             yesButton.setVisible(true);
             noButton.setVisible(true);
-            setQuestionText("You passed validation");
+            askQuestion(formula);
         }
     }
 
@@ -73,8 +73,7 @@ public class FormulaCode {
     while (i > 0)  ; // "While there is a question mark in the formula
         String formula = reader.nextLine();
             {
-
-                boolean trueOrFalse =  answerQuestion(askQuestion(getQuestion(formula)));
+                boolean trueOrFalse = /* answerQuestion(askQuestion(getQuestion(formula)));*/ true;
                     
                 if (trueOrFalse == true)
                 {
@@ -166,7 +165,7 @@ else {truePath = tfOut.substring(0,end); }
         
 }
         
-    protected static String askQuestion(String formula)    {
+    protected static void askQuestion(String formula)    {
    // Scanner reader = new Scanner(System.in);
     //boolean trueOrFalse = true;
     {
@@ -179,7 +178,7 @@ else {truePath = tfOut.substring(0,end); }
       else {trueOrFalse = Boolean.valueOf(input);
               break;
              */ }
-             return ("Is " + getQuestion(formula) + " true?");
+             questionLabel.setText("Is " + getQuestion(formula) + " true?");
       }
        
     //return trueOrFalse;
