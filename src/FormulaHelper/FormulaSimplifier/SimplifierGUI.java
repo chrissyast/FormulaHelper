@@ -12,6 +12,7 @@ import java.awt.event.KeyListener;
 import static FormulaSimplifier.FormulaCode.*;
 
 
+
 public class SimplifierGUI  {
 
     public static JLabel questionLabel = new JLabel();
@@ -52,12 +53,13 @@ public class SimplifierGUI  {
         ActionListener yesListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String formula = textArea.getText();
-                int i = StringUtils.countMatches(formula, "?");
+
+                int i = StringUtils.countMatches(findTrue(formula), "?");
                 if (i > 1) {
-                    String newFormula = "";
-                    newFormula = findTrue(formula);
-                    //questionLabel.setText(askQuestion(newFormula));  //TODO commented out just to test a different part
+
+                    setFormula(findTrue(formula));
+                    askQuestion(formula);
+
                 }
                else {questionLabel.setText("The formula will return " + findTrue(formula));}
             }};
@@ -66,8 +68,15 @@ public class SimplifierGUI  {
             ActionListener noListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    //int i = StringUtils.countMatches(formula, "?");
-                    //         findFalse(formula);
+                    int i = StringUtils.countMatches(findFalse(formula), "?");
+                    if (i > 1) {
+
+                        setFormula(findFalse(formula));
+                        askQuestion(formula);
+
+                    } else {
+                        questionLabel.setText("The formula will return " + findFalse(formula));
+                    }
                 }};
 
 
@@ -84,15 +93,9 @@ public class SimplifierGUI  {
 
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_ENTER) {
-                    String formula = textArea.getText();
+                    setFormula(textArea.getText().replace("/n", ""));
                     analyse(formula);
 
-                 /*   if(!FormulaCode.checkColonsAndQuestionMarks(formula)) {
-                        validateColonsAndQuestionMarks(formula);
-                    }
-                        textArea.setVisible(false);
-                        questionLabel.setText(FormulaCode.askQuestion(textArea.getText()));
-*/
 
                 }
             }

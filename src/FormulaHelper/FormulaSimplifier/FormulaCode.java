@@ -12,7 +12,20 @@ import java.util.Scanner;
 import static FormulaSimplifier.SimplifierGUI.*;
 
 
+
 public class FormulaCode {
+
+    public static String formula;
+
+
+    public static String getFormula() {
+        return formula;
+    }
+
+    public static void setFormula(String formula) {
+        FormulaCode.formula = formula;
+    }
+
 
 
     public static void analyse(String formula) {
@@ -33,8 +46,9 @@ public class FormulaCode {
         int i = StringUtils.countMatches(formula, "?");
         int j = StringUtils.countMatches(formula, ":");
 
-        if (i != j || (formula.indexOf(":") < formula.indexOf("?"))) {
-            StringBuilder validationMessage = new StringBuilder("Please double check your formula\n");
+
+        StringBuilder validationMessage = new StringBuilder("Please double check your formula \n");
+        if (i != j || (formula.indexOf(":") < formula.indexOf("?")) || i == 0 || j == 0) {
 
             if (i != j) {
                 validationMessage.append("There is an uneven number of colons and question marks\n");
@@ -45,19 +59,15 @@ public class FormulaCode {
                 validationMessage.append("The first colon comes before the first question mark. Please double check your formula\n");
 
             }
+            if (i == 0 || j == 0) {
+                validationMessage.append("Formula should contain at least 1 colon and 1 question mark.");
+            }
             questionLabel.setText(validationMessage.toString());
             return false;
         }
         return true;
     }
 
-
-    public boolean areThereStillQuestionMarks(String formula) {
-
-        if (StringUtils.countMatches(formula, "?") > 1) {
-            return true;
-        } else return false;
-    }
 
     public static void main(String[] args) {
 
