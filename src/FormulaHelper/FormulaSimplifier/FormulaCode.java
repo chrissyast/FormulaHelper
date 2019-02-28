@@ -46,22 +46,21 @@ public class FormulaCode {
         int i = StringUtils.countMatches(formula, "?");
         int j = StringUtils.countMatches(formula, ":");
 
-
         StringBuilder validationMessage = new StringBuilder("Please double check your formula \n");
         if (i != j || (formula.indexOf(":") < formula.indexOf("?")) || i == 0 || j == 0) {
 
             if (i != j) {
                 validationMessage.append("There is an uneven number of colons and question marks\n");
-
             }
 
             if (formula.indexOf(":") < formula.indexOf("?")) {
                 validationMessage.append("The first colon comes before the first question mark. Please double check your formula\n");
-
             }
+
             if (i == 0 || j == 0) {
                 validationMessage.append("Formula should contain at least 1 colon and 1 question mark.");
             }
+
             questionLabel.setText(validationMessage.toString());
             return false;
         }
@@ -75,11 +74,7 @@ public class FormulaCode {
         Boolean goOn;
         int i = 0;
         int reps = 0;
-    /*    do {  //Scanner reader = new Scanner(System.in);
-            System.out.println("What is the formula?");
-            String formula = reader.nextLine();
 
-        }  */
     while (i > 0)  ; // "While there is a question mark in the formula
         String formula = reader.nextLine();
             {
@@ -111,7 +106,6 @@ public class FormulaCode {
     int colonOrder = 1;
     int colonInd = StringUtils.ordinalIndexOf(formula,":",colonOrder);
     String toColon = formula.substring(0,colonInd+1);
-    //String beforeColon = formula.substring(0,colonInd);
     String afterColon = formula.substring(colonInd+1);
     String trueFalseOutput;
     int questionMarkCount = StringUtils.countMatches(toColon,"?"); // how many questions marks are before the colonOrder-th colon ?
@@ -144,11 +138,9 @@ if (start == -1) {
                 truePath= tfOut.substring(0,end);
                 
                 }
-//else {truePath = tfOut.substring(start-1,end); }
 else {truePath = tfOut.substring(0,end); }
     return truePath;
-    
-    
+
     }
     
 
@@ -176,26 +168,12 @@ else {truePath = tfOut.substring(0,end); }
 }
         
     protected static void askQuestion(String formula)    {
-   // Scanner reader = new Scanner(System.in);
-    //boolean trueOrFalse = true;
-    {
-      /*while (true)*/ //{System.out.println("Is " + question + " true?");
 
-      /*String input = reader.nextLine();
-      if ((!input.equals("true"))&&(!input.equals("false"))){
-          System.out.println("Please type 'true' or 'false'");
-              }
-      else {trueOrFalse = Boolean.valueOf(input);
-              break;
-             */ }
              questionLabel.setText("Is " + getQuestion(formula) + " true?");
       }
-       
-    //return trueOrFalse;
-    //}
 
-
-    public static Boolean answerQuestion (String question){
+      // TODO double check that this is redundant and delete if not needed.
+  /*  public static Boolean answerQuestion (String question){
         boolean trueOrFalse = true;
          Scanner reader = new Scanner(System.in);
       String input = reader.nextLine();
@@ -203,17 +181,16 @@ else {truePath = tfOut.substring(0,end); }
             System.out.println("Please type 'true' or 'false'");
         }
         return Boolean.valueOf(input);
-    }
+    } */
 
-    
+    //TODO make this into a GUI-friendly thing
     public static Boolean playAgain ()   {
         Scanner reader = new Scanner(System.in);
 
     {
       System.out.println("Thanks for playing! Do you want to try another formula?");
-                    System.out.println("Press Y to play again, any other key to quit");
-              
-       String input = reader.nextLine();
+
+      String input = reader.nextLine();
       return input.equals("Y");
               }}
  

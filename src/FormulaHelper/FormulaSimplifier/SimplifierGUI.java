@@ -44,11 +44,6 @@ public class SimplifierGUI  {
         questionsAndAnswers.add(textArea);
         questionLabel.setText("What is the formula?");
 
-        if(!textArea.getText().isEmpty())
-         {
-          final String formula = textArea.getText();
-        }
-
 
         ActionListener yesListener = new ActionListener() {
             @Override
@@ -117,9 +112,7 @@ public class SimplifierGUI  {
     }
 
     public static void setQuestionText(String message) {
-
         questionLabel.setText(message);
-
     }
 
 
