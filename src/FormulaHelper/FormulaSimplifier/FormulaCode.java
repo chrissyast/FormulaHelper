@@ -22,6 +22,23 @@ public class FormulaCode {
         return formula;
     }
 
+    public static void initialise() {
+
+        yesButton.setVisible(true);
+        noButton.setVisible(true);
+        yesNoPanel.add(yesButton);
+        yesNoPanel.add(noButton);
+    }
+
+    public static void restart() {
+        questionLabel.setText("What is the formula?");
+        questionLabel.setVisible(true);
+        textArea.setText("");
+        textArea.setVisible(true);
+        yesNoPanel.setVisible(false);
+
+    }
+
     public static void setFormula(String formula) {
         FormulaCode.formula = formula;
     }

@@ -19,19 +19,17 @@ public class SimplifierGUI  {
     public static JButton yesButton = new JButton("Yes");
     public static JButton noButton = new JButton("No");
     public static JTextArea textArea = new JTextArea(10, 40);
+    public static JPanel yesNoPanel = new JPanel();
+    public static JButton restartButton = new JButton("Restart");
 
     public static void main(String[] args) {
 
         JFrame f = new JFrame("A JFrame");
-        JPanel yesNoPanel = new JPanel();
+
         f.setSize(500, 500);
         f.setLocation(300,200);
 
-
-        yesButton.setVisible(false);
-        noButton.setVisible(false);
-        yesNoPanel.add(yesButton);
-        yesNoPanel.add(noButton);
+        initialise();
 
         JPanel questionsAndAnswers  = new JPanel();
 
@@ -57,6 +55,7 @@ public class SimplifierGUI  {
 
                 }
                else {questionLabel.setText("The formula will return " + findTrue(formula));}
+                yesNoPanel.add(restartButton);
             }};
 
 
@@ -71,10 +70,16 @@ public class SimplifierGUI  {
 
                     } else {
                         questionLabel.setText("The formula will return " + findFalse(formula));
+                        yesNoPanel.add(restartButton);
                     }
                 }};
 
-
+        ActionListener restartListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                restart();
+            }
+        };
 
 
         KeyListener keyListener = new KeyListener() {
@@ -103,7 +108,7 @@ public class SimplifierGUI  {
         textArea.addKeyListener(keyListener);
         yesButton.addActionListener(yesListener);
         noButton.addActionListener(noListener);
-
+        restartButton.addActionListener(restartListener);
 
 
 
