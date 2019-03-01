@@ -54,8 +54,8 @@ public class SimplifierGUI  {
                     askQuestion(formula);
 
                 }
-               else {questionLabel.setText("The formula will return " + findTrue(formula));}
-                yesNoPanel.add(restartButton);
+               else {returnAnswer(findTrue(formula));
+               }
             }};
 
 
@@ -69,8 +69,7 @@ public class SimplifierGUI  {
                         askQuestion(formula);
 
                     } else {
-                        questionLabel.setText("The formula will return " + findFalse(formula));
-                        yesNoPanel.add(restartButton);
+                        returnAnswer(findFalse(formula));
                     }
                 }};
 

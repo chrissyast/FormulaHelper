@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/src/FormulaSimplifierGUI.iml" filepath="$PROJECT_DIR$/src/FormulaSimplifierGUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FormulaSimplifierGUI.iml" filepath="$PROJECT_DIR$/.idea/FormulaSimplifierGUI.iml" />
     </modules>
   </component>
 </project>

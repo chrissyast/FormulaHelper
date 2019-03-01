@@ -16,6 +16,7 @@ import static FormulaSimplifier.SimplifierGUI.*;
 public class FormulaCode {
 
     public static String formula;
+    public static Integer x;
 
 
     public static String getFormula() {
@@ -24,8 +25,8 @@ public class FormulaCode {
 
     public static void initialise() {
 
-        yesButton.setVisible(true);
-        noButton.setVisible(true);
+        yesButton.setVisible(false);
+        noButton.setVisible(false);
         yesNoPanel.add(yesButton);
         yesNoPanel.add(noButton);
     }
@@ -52,6 +53,9 @@ public class FormulaCode {
             textArea.setVisible(false);
             yesButton.setVisible(true);
             noButton.setVisible(true);
+            yesButton.setEnabled(true);
+            noButton.setEnabled(true);
+            yesNoPanel.setVisible(true);
             askQuestion(formula);
         }
     }
@@ -63,21 +67,23 @@ public class FormulaCode {
         int i = StringUtils.countMatches(formula, "?");
         int j = StringUtils.countMatches(formula, ":");
 
-        StringBuilder validationMessage = new StringBuilder("Please double check your formula \n");
-        if (i != j || (formula.indexOf(":") < formula.indexOf("?")) || i == 0 || j == 0) {
+        StringBuilder validationMessage = new StringBuilder("Please double check your formula: \n");
+        if (i != j || (formula.indexOf(":") < formula.indexOf("?")) || i == 0 || j == 0 || areThereColonsBeforeQuestionMarks(formula)) {
 
             if (i != j) {
                 validationMessage.append("There is an uneven number of colons and question marks\n");
             }
 
-            if (formula.indexOf(":") < formula.indexOf("?")) {
-                validationMessage.append("The first colon comes before the first question mark. Please double check your formula\n");
-            }
+           /* if (formula.indexOf(":") < formula.indexOf("?")) {
+                validationMessage.append("The first colon comes before the first question mark.\n");
+            }*/
 
             if (i == 0 || j == 0) {
                 validationMessage.append("Formula should contain at least 1 colon and 1 question mark.");
             }
-
+            if (areThereColonsBeforeQuestionMarks(formula)) {
+                validationMessage.append("Colon " + i + " comes before question mark " + i + ".");
+            }
             questionLabel.setText(validationMessage.toString());
             return false;
         }
@@ -142,7 +148,22 @@ public class FormulaCode {
     return trueFalseOutput;
     }
     
-    
+
+    public static boolean areThereColonsBeforeQuestionMarks (String formula){
+        int questionMarkCount = StringUtils.countMatches(formula,"?");
+        int colonCount = StringUtils.countMatches(formula,":");
+        int i = 0;
+       // int x = 0;
+                while (i<=questionMarkCount) {
+                    if (StringUtils.ordinalIndexOf(formula,":",i) < StringUtils.ordinalIndexOf(formula,"?",i)) {
+                        x = i;
+                        return true;
+                    }
+                    i++;
+                }
+            return  false;
+    }
+
     public static String findTrue(String formula) {
         
  
@@ -189,6 +210,13 @@ else {truePath = tfOut.substring(0,end); }
              questionLabel.setText("Is " + getQuestion(formula) + " true?");
       }
 
+
+      protected static void returnAnswer (String answer){
+          questionLabel.setText("The formula will return " + answer);
+          yesNoPanel.add(restartButton);
+          yesButton.setEnabled(false);
+          noButton.setEnabled(false);
+      }
       // TODO double check that this is redundant and delete if not needed.
   /*  public static Boolean answerQuestion (String question){
         boolean trueOrFalse = true;
