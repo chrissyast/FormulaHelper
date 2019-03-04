@@ -7,10 +7,11 @@
 package FormulaSimplifier;
 
 import org.apache.commons.lang3.StringUtils;
+import javax.swing.*;
 import java.util.Scanner;
 
 import static FormulaSimplifier.SimplifierGUI.*;
-
+import static java.lang.Math.abs;
 
 
 public class FormulaCode {
@@ -66,65 +67,35 @@ public class FormulaCode {
 
         int i = StringUtils.countMatches(formula, "?");
         int j = StringUtils.countMatches(formula, ":");
-
         StringBuilder validationMessage = new StringBuilder("Please double check your formula: \n");
         if (i != j || (formula.indexOf(":") < formula.indexOf("?")) || i == 0 || j == 0 || areThereColonsBeforeQuestionMarks(formula)) {
 
             if (i != j) {
-                validationMessage.append("There is an uneven number of colons and question marks\n");
+                if (abs(i-j)>1) {
+                    if (i > j) {
+                        validationMessage.append("There are " + (i - j) + " more question marks than colons");
+                    } else validationMessage.append("There are " + (j - i) + " more question marks than colons");
+                }
+                else if (i>j) {
+                    validationMessage.append("There is one more question mark than colons");
+                }
+                else {validationMessage.append("There is one more colon than question marks");}
             }
 
-           /* if (formula.indexOf(":") < formula.indexOf("?")) {
-                validationMessage.append("The first colon comes before the first question mark.\n");
-            }*/
-
-            if (i == 0 || j == 0) {
+           if (i == 0 || j == 0) {
                 validationMessage.append("Formula should contain at least 1 colon and 1 question mark.");
             }
             if (areThereColonsBeforeQuestionMarks(formula)) {
                 validationMessage.append("Colon " + i + " comes before question mark " + i + ".");
             }
-            questionLabel.setText(validationMessage.toString());
+
+            JOptionPane.showMessageDialog(f,validationMessage.toString());
             return false;
         }
         return true;
     }
 
 
-    public static void main(String[] args) {
-
-        Scanner reader = new Scanner(System.in);
-        Boolean goOn;
-        int i = 0;
-        int reps = 0;
-
-    while (i > 0)  ; // "While there is a question mark in the formula
-        String formula = reader.nextLine();
-            {
-                boolean trueOrFalse = /* answerQuestion(askQuestion(getQuestion(formula)));*/ true;
-                    
-                if (trueOrFalse == true)
-                {
-                formula=findTrue(formula);                           
-                }else {
-                formula=findFalse(formula);
-                       }
-                i =  StringUtils.countMatches(formula,"?");
-            }
-                                   
-                    System.out.println("Formula will return the result: " + formula);
-                    goOn =playAgain();
-                    reps++;
-                    
-               
-             while (goOn);
-                    if (reps==1) {System.out.println("You have simplified " + reps + " formula in this session!");}
-                    else {System.out.println("You have simplified " + reps + " formulae in this session!");}
-                    System.out.println("Have a nice day!");
-                    reader.nextLine();
-                
-        }
-    
     public static String splitTrueFalse(String formula) {
     int colonOrder = 1;
     int colonInd = StringUtils.ordinalIndexOf(formula,":",colonOrder);
@@ -151,9 +122,8 @@ public class FormulaCode {
 
     public static boolean areThereColonsBeforeQuestionMarks (String formula){
         int questionMarkCount = StringUtils.countMatches(formula,"?");
-        int colonCount = StringUtils.countMatches(formula,":");
         int i = 0;
-       // int x = 0;
+
                 while (i<=questionMarkCount) {
                     if (StringUtils.ordinalIndexOf(formula,":",i) < StringUtils.ordinalIndexOf(formula,"?",i)) {
                         x = i;
@@ -217,18 +187,9 @@ else {truePath = tfOut.substring(0,end); }
           yesButton.setEnabled(false);
           noButton.setEnabled(false);
       }
-      // TODO double check that this is redundant and delete if not needed.
-  /*  public static Boolean answerQuestion (String question){
-        boolean trueOrFalse = true;
-         Scanner reader = new Scanner(System.in);
-      String input = reader.nextLine();
-        if ((!input.equals("true"))&&(!input.equals("false"))){
-            System.out.println("Please type 'true' or 'false'");
-        }
-        return Boolean.valueOf(input);
-    } */
 
-    //TODO make this into a GUI-friendly thing
+
+    //TODO make this into a GUI-friendly thing, show a count in the bottom right of GUI
     public static Boolean playAgain ()   {
         Scanner reader = new Scanner(System.in);
 

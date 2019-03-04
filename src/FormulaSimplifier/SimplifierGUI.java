@@ -21,10 +21,9 @@ public class SimplifierGUI  {
     public static JTextArea textArea = new JTextArea(10, 40);
     public static JPanel yesNoPanel = new JPanel();
     public static JButton restartButton = new JButton("Restart");
+    public static Frame f = new JFrame("Formula Simplifier");
 
     public static void main(String[] args) {
-
-        JFrame f = new JFrame("A JFrame");
 
         f.setSize(500, 500);
         f.setLocation(300,200);
