@@ -47,7 +47,7 @@ public class SimplifierGUI  {
             public void actionPerformed(ActionEvent e) {
 
                 int i = StringUtils.countMatches(findTrue(formula), "?");
-                if (i > 1) {
+                if (i > 0) {
 
                     setFormula(findTrue(formula));
                     askQuestion(formula);
@@ -62,7 +62,7 @@ public class SimplifierGUI  {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int i = StringUtils.countMatches(findFalse(formula), "?");
-                    if (i > 1) {
+                    if (i > 0) {
 
                         setFormula(findFalse(formula));
                         askQuestion(formula);
