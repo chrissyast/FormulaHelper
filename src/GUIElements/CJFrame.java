@@ -1,4 +1,4 @@
-package FormulaSimplifier.GUIElements;
+package GUIElements;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
