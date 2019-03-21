@@ -114,9 +114,5 @@ public class SimplifierGUI  {
 
     }
 
-    public static void setQuestionText(String message) {
-        questionLabel.setText(message);
-    }
-
 
 }

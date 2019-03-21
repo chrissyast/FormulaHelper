@@ -57,11 +57,26 @@ public class FormulaCode {
             yesButton.setEnabled(true);
             noButton.setEnabled(true);
             yesNoPanel.setVisible(true);
-            askQuestion(formula);
+            if (StringUtils.countMatches(formula, "&&") > 0) {
+                separateAndsAndOrs(getQuestion(formula));
+            }
+            else askQuestion(formula);
         }
     }
 
+    public static void separateAndsAndOrs(String formula) {
 
+        if (StringUtils.countMatches(formula, "&&") > 0) {
+            String[] clauses = StringUtils.split(formula, "&&");
+
+            for (String clause : clauses) {
+                askDirectQuestion(clause);
+
+            }
+
+        }
+
+    }
 
     public static boolean checkColonsAndQuestionMarks (String formula) {
 
@@ -73,20 +88,23 @@ public class FormulaCode {
             if (i != j) {
                 if (abs(i-j)>1) {
                     if (i > j) {
-                        validationMessage.append("There are " + (i - j) + " more question marks than colons");
-                    } else validationMessage.append("There are " + (j - i) + " more question marks than colons");
+                        validationMessage.append("There are " + (i - j) + " more question marks than colons\n");
+                    }
+                    else validationMessage.append("There are " + (j - i) + " more question marks than colons\n");
                 }
                 else if (i>j) {
-                    validationMessage.append("There is one more question mark than colons");
+                    validationMessage.append("There is one more question mark than colons\n");
                 }
-                else {validationMessage.append("There is one more colon than question marks");}
+                else {
+                    validationMessage.append("There is one more colon than question marks\n");
+                }
             }
 
            if (i == 0 || j == 0) {
-                validationMessage.append("Formula should contain at least 1 colon and 1 question mark.");
+               validationMessage.append("Formula should contain at least 1 colon and 1 question mark.\n");
             }
-            if (areThereColonsBeforeQuestionMarks(formula)) {
-                validationMessage.append("Colon " + i + " comes before question mark " + i + ".");
+            if ((i == j) && areThereColonsBeforeQuestionMarks(formula)) {
+                validationMessage.append("Colon " + i + " comes before question mark " + i + ".\n");
             }
 
             JOptionPane.showMessageDialog(f,validationMessage.toString());
@@ -179,6 +197,11 @@ else {truePath = tfOut.substring(0,end); }
 
              questionLabel.setText("Is " + getQuestion(formula) + " true?");
       }
+
+    protected static void askDirectQuestion(String question) {
+
+        questionLabel.setText("Is " + question + " true?");
+    }
 
 
       protected static void returnAnswer (String answer){
