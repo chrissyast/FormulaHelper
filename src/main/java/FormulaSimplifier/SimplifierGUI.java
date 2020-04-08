@@ -45,31 +45,14 @@ public class SimplifierGUI  {
         ActionListener yesListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                int i = StringUtils.countMatches(findTrue(formula), "?");
-                if (i > 0) {
-
-                    setFormula(findTrue(formula));
-                    askQuestion(formula);
-
-                }
-               else {returnAnswer(findTrue(formula));
-               }
+                handleYesResponse(subFormula);
             }};
 
 
             ActionListener noListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int i = StringUtils.countMatches(findFalse(formula), "?");
-                    if (i > 0) {
-
-                        setFormula(findFalse(formula));
-                        askQuestion(formula);
-
-                    } else {
-                        returnAnswer(findFalse(formula));
-                    }
+                    handleNoResponse(subFormula);
                 }};
 
         ActionListener restartListener = new ActionListener() {
@@ -91,8 +74,8 @@ public class SimplifierGUI  {
 
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_ENTER) {
-                    setFormula(textArea.getText().replace("/n", ""));
-                    analyse(formula);
+                    setOriginalFormula(textArea.getText().replace("/n", ""));
+                    analyse(originalFormula);
 
 
                 }
@@ -107,8 +90,6 @@ public class SimplifierGUI  {
         yesButton.addActionListener(yesListener);
         noButton.addActionListener(noListener);
         restartButton.addActionListener(restartListener);
-
-
 
         f.setVisible(true);
 
