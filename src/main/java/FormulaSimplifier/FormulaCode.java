@@ -4,7 +4,6 @@ package FormulaSimplifier;
 
 import org.apache.commons.lang3.StringUtils;
 import javax.swing.*;
-import java.util.Scanner;
 
 import static FormulaSimplifier.SimplifierGUI.*;
 import static java.lang.Math.abs;
@@ -12,14 +11,24 @@ import static java.lang.Math.abs;
 
 public class FormulaCode {
 
-    public static String originalFormula;
+    private String originalFormula;
+    public static String subFormula;
+    private SubClause subClause;
+    public static String[] questions;
+    public static boolean resolved;
+    public static String TRUE_FALSE_SEPARATOR = "<-TRUEFALSE->";
+
+    public FormulaCode(String originalFormula) {
+        this.originalFormula = originalFormula;
+    }
 
     public static String getSubFormula() {
         return subFormula;
     }
 
-    public static void setSubFormula(String subFormula) {
+    public void setSubFormula(String subFormula) {
         FormulaCode.subFormula = subFormula;
+        setupQuestions();
     }
 
     public static String[] getQuestions() {
@@ -29,74 +38,22 @@ public class FormulaCode {
     public static void setQuestions(String[] questions) {
         FormulaCode.questions = questions;
     }
-
-    public static String subFormula;
-    public static String[] questions;
-
     public static void setResolved(boolean resolved) {
         FormulaCode.resolved = resolved;
     }
 
-    public static boolean resolved;
-    public static String TRUE_FALSE_SEPARATOR = "<-TRUEFALSE->";
 
-
-    public static String getOriginalFormula() {
+    public String getOriginalFormula() {
         return originalFormula;
     }
 
-    public static void initialise() {
 
-        yesButton.setVisible(false);
-        noButton.setVisible(false);
-        yesNoPanel.add(yesButton);
-        yesNoPanel.add(noButton);
+    void setOriginalFormula(String originalFormula) {
+        this.originalFormula = originalFormula;
     }
 
-    public static void restart() {
-        questionLabel.setText("What is the formula?");
-        questionLabel.setVisible(true);
-        textArea.setText("");
-        textArea.setVisible(true);
-        yesNoPanel.setVisible(false);
-
-    }
-
-    public static void setOriginalFormula(String originalFormula) {
-        FormulaCode.originalFormula = originalFormula;
-    }
-
-
-    public static void analyse(String formula) {
-
-        if (checkColonsAndQuestionMarks(formula)) {
-
-            setUIForQuestion();
-            setQuestions(StringUtils.split(findQuestion(formula), "&&"));
-            //   if (StringUtils.countMatches(formula, "&&") > 0) {
-            //       separateAndsAndOrs(findQuestion(formula));
-            //   }
-            //  while (!resolved)
-            for (String question : questions) {
-                askDirectQuestion(question);
-            }
-        }
-    }
-
-    private static void setUIForQuestion() {
-        textArea.setVisible(false);
-        yesButton.setVisible(true);
-        noButton.setVisible(true);
-        yesButton.setEnabled(true);
-        noButton.setEnabled(true);
-        yesNoPanel.setVisible(true);
-    }
-
-    private static void awaitQuestionResponse(String question) {
-        while (resolved) {
-
-        }
-
+    protected boolean verify() {
+        return checkColonsAndQuestionMarks(originalFormula);
     }
 
   /*  public static void separateAndsAndOrs(String formula) {
@@ -140,30 +97,24 @@ public class FormulaCode {
         return true;
     }
 
-    public static void handleYesResponse(String subFormula) {
-        int i = StringUtils.countMatches(findTrue(subFormula), "?");
+    void handleYesResponse() {
+        int i = StringUtils.countMatches(subClause.truePart, "?");
         if (i > 0) {
-
-            setSubFormula(findTrue(subFormula));
-            askDirectQuestion(subFormula);
-
+            setSubFormula(subClause.truePart);
+            askQuestion();
         } else {
-            returnAnswer(findTrue(subFormula));
+            returnAnswer(subClause.truePart);
         }
-        //  setResolved(false);
     }
 
-    public static void handleNoResponse(String subFormula) {
-        int i = StringUtils.countMatches(findFalse(originalFormula), "?");
+    void handleNoResponse() {
+        int i = StringUtils.countMatches(subClause.falsePart, "?");
         if (i > 0) {
-
-            setOriginalFormula(findFalse(originalFormula));
-            askDirectQuestion(originalFormula);
-
+            setSubFormula(subClause.falsePart);
+            askQuestion();
         } else {
-            returnAnswer(findFalse(originalFormula));
+            returnAnswer(subClause.falsePart);
         }
-        // setResolved(false);
     }
 
     public static String splitTrueFalse(String formula) {
@@ -191,12 +142,10 @@ public class FormulaCode {
 
     public static boolean areThereColonsBeforeQuestionMarks(String formula) {
         int questionMarkCount = StringUtils.countMatches(formula, "?");
-        // int x;
         int i = 0;
 
         while (i <= questionMarkCount) {
             if (StringUtils.ordinalIndexOf(formula, ":", i) < StringUtils.ordinalIndexOf(formula, "?", i)) {
-                //   x = i;
                 return true;
             }
             i++;
@@ -205,7 +154,6 @@ public class FormulaCode {
     }
 
     public static String findTrue(String formula) {
-
 
         String tfOut = splitTrueFalse(formula);
         int end = tfOut.indexOf(TRUE_FALSE_SEPARATOR);
@@ -223,43 +171,42 @@ public class FormulaCode {
     }
 
 
-    public static String findFalse(String formula) {
-
+    public String findFalse(String formula) {
         String tfOut = splitTrueFalse(formula);
         int start = tfOut.indexOf(TRUE_FALSE_SEPARATOR) + (TRUE_FALSE_SEPARATOR).length();
         String falsePath = tfOut.substring(start);
         return falsePath;
-
     }
 
 
-    public static String findQuestion(String formula) {
-
+    private String findQuestion(String formula) {
         int s = 0;
         int questMarkInd = 1;
         int x = StringUtils.ordinalIndexOf(formula, "?", questMarkInd);
         String question = formula.substring(s, x);
-
         return (question);
-
     }
         
-   /* protected static void askQuestion(String formula)    {
+    protected void askQuestion()    {
+            questionLabel.setText("Is " + subClause.condition + " true?");
+      }
 
-             questionLabel.setText("Is " + findQuestion(formula) + " true?");
-      }*/
 
-    protected static void askDirectQuestion(String question) {
-        questionLabel.setText("Is " + question + " true?");
-        // setResolved(true);
+
+    public void setupQuestions() {
+        this.subClause = new SubClause(findQuestion(subFormula), findTrue(subFormula), findFalse(subFormula));
     }
 
+    public class SubClause {
+        private String condition;
+        private String truePart;
+        private String falsePart;
 
-    protected static void returnAnswer(String answer) {
-        questionLabel.setText("The formula will return " + answer);
-        yesNoPanel.add(restartButton);
-        yesButton.setEnabled(false);
-        noButton.setEnabled(false);
+        public SubClause(String condition, String truePart, String falsePart) {
+            this.condition = condition;
+            this.truePart = truePart;
+            this.falsePart = falsePart;
+        }
     }
 }
 
