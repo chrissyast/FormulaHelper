@@ -9,7 +9,7 @@ import static FormulaSimplifier.SimplifierGUI.*;
 import static java.lang.Math.abs;
 
 
-public class FormulaCode {
+public class Formula {
 
     private String originalFormula;
     public static String subFormula;
@@ -18,7 +18,7 @@ public class FormulaCode {
     public static boolean resolved;
     public static String TRUE_FALSE_SEPARATOR = "<-TRUEFALSE->";
 
-    public FormulaCode(String originalFormula) {
+    public Formula(String originalFormula) {
         this.originalFormula = originalFormula;
     }
 
@@ -27,7 +27,7 @@ public class FormulaCode {
     }
 
     public void setSubFormula(String subFormula) {
-        FormulaCode.subFormula = subFormula;
+        Formula.subFormula = subFormula;
         setupQuestions();
     }
 
@@ -35,18 +35,9 @@ public class FormulaCode {
         return questions;
     }
 
-    public static void setQuestions(String[] questions) {
-        FormulaCode.questions = questions;
-    }
-    public static void setResolved(boolean resolved) {
-        FormulaCode.resolved = resolved;
-    }
-
-
     public String getOriginalFormula() {
         return originalFormula;
     }
-
 
     void setOriginalFormula(String originalFormula) {
         this.originalFormula = originalFormula;
@@ -55,15 +46,6 @@ public class FormulaCode {
     protected boolean verify() {
         return checkColonsAndQuestionMarks(originalFormula);
     }
-
-  /*  public static void separateAndsAndOrs(String formula) {
-
-        if (StringUtils.countMatches(formula, "&&") > 0) {
-            String[] clauses = StringUtils.split(formula, "&&");
-
-        }
-
-    }*/
 
     public static boolean checkColonsAndQuestionMarks(String formula) {
 
@@ -186,11 +168,11 @@ public class FormulaCode {
         String question = formula.substring(s, x);
         return (question);
     }
-        
-    protected void askQuestion()    {
-            questionLabel.setText("Is " + subClause.condition + " true?");
-      }
 
+    // TODO move into GUI ?
+    protected void askQuestion() {
+        questionLabel.setText("Is " + subClause.test.nextQuestion() + " true?");
+    }
 
 
     public void setupQuestions() {
@@ -198,12 +180,12 @@ public class FormulaCode {
     }
 
     public class SubClause {
-        private String condition;
+        private Test test;
         private String truePart;
         private String falsePart;
 
-        public SubClause(String condition, String truePart, String falsePart) {
-            this.condition = condition;
+        public SubClause(String conditionString, String truePart, String falsePart) {
+            this.test = new Test(conditionString);
             this.truePart = truePart;
             this.falsePart = falsePart;
         }

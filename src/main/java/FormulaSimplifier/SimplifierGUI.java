@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import static FormulaSimplifier.FormulaCode.*;
+import static FormulaSimplifier.Formula.*;
 
 
 
@@ -21,7 +21,7 @@ public class SimplifierGUI  {
     // TODO implement one button for restart with old formula, one to restart with brand new formula
     public static JButton restartButton = new JButton("Restart");
     public static Frame f = new JFrame("Formula Simplifier");
-    public static FormulaCode formula;
+    public static Formula formula;
 
     public static void main(String[] args) {
 
@@ -62,7 +62,7 @@ public class SimplifierGUI  {
 
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_ENTER) {
-                    formula = new FormulaCode(textArea.getText().replace("/n", ""));
+                    formula = new Formula(textArea.getText().replace("/n", ""));
                     subFormula = formula.getOriginalFormula();
                     if (formula.verify()) {
                         formula.setupQuestions();
