@@ -78,24 +78,36 @@ public class Formula {
         }
         return true;
     }
-
+    // TODO refactor Yes and No responses into single method
     void handleYesResponse() {
-        int i = StringUtils.countMatches(subClause.truePart, "?");
-        if (i > 0) {
-            setSubFormula(subClause.truePart);
-            askQuestion();
-        } else {
+        Test.Response response = this.subClause.test.answerQuestion(true, this.subClause.test.currentCondition);
+        if (response.resolved) {
+            int i = StringUtils.countMatches(subClause.truePart, "?");
+            if (i > 0) {
+                setSubFormula(subClause.truePart);
+                askQuestion();
+            } else {
             returnAnswer(subClause.truePart);
+            }
+        } else {
+            askQuestion(response.newQuestion.conditionString);
         }
     }
 
     void handleNoResponse() {
-        int i = StringUtils.countMatches(subClause.falsePart, "?");
-        if (i > 0) {
-            setSubFormula(subClause.falsePart);
-            askQuestion();
+        Test.Response response = this.subClause.test.answerQuestion(false, this.subClause.test.currentCondition);
+        if (response.resolvedOutcome != null) {
+            String returnedPart = response.resolvedOutcome ? subClause.truePart : subClause.falsePart;
+            int i = StringUtils.countMatches(returnedPart, "?");
+            if (i > 0) {
+                setSubFormula(returnedPart);
+                askQuestion();
+            } else {
+            returnAnswer(returnedPart);
+            }
         } else {
-            returnAnswer(subClause.falsePart);
+            this.subClause.test.currentCondition = response.newQuestion;
+            askQuestion(response.newQuestion.conditionString);
         }
     }
 
@@ -171,9 +183,12 @@ public class Formula {
 
     // TODO move into GUI ?
     protected void askQuestion() {
-        questionLabel.setText("Is " + subClause.test.nextQuestion() + " true?");
+        questionLabel.setText("Is " + subClause.test.currentCondition.conditionString + " true?");
     }
 
+    protected void askQuestion(String question) {
+        questionLabel.setText("Is " + question + " true?");
+    }
 
     public void setupQuestions() {
         this.subClause = new SubClause(findQuestion(subFormula), findTrue(subFormula), findFalse(subFormula));
