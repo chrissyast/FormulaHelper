@@ -31,17 +31,34 @@ public class Test {
     }
 
     public Response answerQuestion(boolean answer, Condition currentCondition) {
-        if (answer && currentCondition instanceof Or && currentCondition.parent == null) {
-            return new Response(true);
-        }
-        if (answer && currentCondition instanceof Or && currentCondition.parent != null) {
-            int parentIndex = currentCondition.parent.siblings.indexOf(currentCondition.parent);
-            List<Condition> parentSiblings = currentCondition.parent.siblings;
-            if (parentIndex + 1 < parentSiblings.size()) {
-                return new Response(parentSiblings.get(parentIndex + 1).getDeepestDescendant());
+
+        if (answer && currentCondition instanceof Or) {
+            if (currentCondition.parent != null) {
+                int parentIndex = currentCondition.parent.siblings.indexOf(currentCondition.parent);
+                List<Condition> parentSiblings = currentCondition.parent.siblings;
+                if (parentIndex + 1 < parentSiblings.size()) {
+                    return new Response(parentSiblings.get(parentIndex + 1).getDeepestDescendant());
+                }
             }
             return new Response(true);
         }
+
+        if (!answer && currentCondition instanceof Or) {
+            int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
+            if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
+                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
+            }
+            return new Response(false);
+        }
+
+        if (answer && currentCondition instanceof And) {
+            int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
+            if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
+                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
+            }
+            return new Response(true);
+        }
+
         if (!answer && currentCondition instanceof And) {
             int parentIndex = currentCondition.parent.siblings.indexOf(currentCondition.parent);
             List<Condition> parentSiblings = currentCondition.parent.siblings;
@@ -50,25 +67,8 @@ public class Test {
             }
             return new Response(false);
         }
-        if (answer && currentCondition instanceof And && currentCondition.siblings != null) {
-            int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
-            if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
-                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
-            }
-            else return new Response(false);
-        }
-        // TODO don't think siblings will ever be null
-       /* if (!answer && currentCondition instanceof Or && currentCondition.siblings == null) {
-            return new Response(false);
-        }*/
-        if (!answer && currentCondition instanceof Or) {
-            int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
-            if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
-                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
-            }
-            else return new Response(false);
-        }
-        else return null;
+
+        return null;
     }
 
     public Condition firstQuestion() {
