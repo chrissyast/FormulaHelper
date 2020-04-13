@@ -81,7 +81,7 @@ public class Formula {
     // TODO refactor Yes and No responses into single method
     void handleYesResponse() {
         Test.Response response = this.subClause.test.answerQuestion(true, this.subClause.test.currentCondition);
-        if (response.resolved) {
+        if (response.resolvedOutcome != null) {
             int i = StringUtils.countMatches(subClause.truePart, "?");
             if (i > 0) {
                 setSubFormula(subClause.truePart);
@@ -90,6 +90,7 @@ public class Formula {
             returnAnswer(subClause.truePart);
             }
         } else {
+            this.subClause.test.currentCondition = response.newQuestion;
             askQuestion(response.newQuestion.conditionString);
         }
     }

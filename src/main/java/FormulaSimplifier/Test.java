@@ -34,13 +34,37 @@ public class Test {
         if (answer && currentCondition instanceof Or && currentCondition.parent == null) {
             return new Response(true);
         }
-        if (!answer && currentCondition instanceof Or && currentCondition.siblings == null) {
+        if (answer && currentCondition instanceof Or && currentCondition.parent != null) {
+            int parentIndex = currentCondition.parent.siblings.indexOf(currentCondition.parent);
+            List<Condition> parentSiblings = currentCondition.parent.siblings;
+            if (parentIndex + 1 < parentSiblings.size()) {
+                return new Response(parentSiblings.get(parentIndex + 1).getDeepestDescendant());
+            }
+            return new Response(true);
+        }
+        if (!answer && currentCondition instanceof And) {
+            int parentIndex = currentCondition.parent.siblings.indexOf(currentCondition.parent);
+            List<Condition> parentSiblings = currentCondition.parent.siblings;
+            if (parentIndex + 1 < parentSiblings.size()) {
+                return new Response(parentSiblings.get(parentIndex + 1).getDeepestDescendant());
+            }
             return new Response(false);
         }
-        if (!answer && currentCondition instanceof Or && currentCondition.siblings != null) {
+        if (answer && currentCondition instanceof And && currentCondition.siblings != null) {
             int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
             if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
-                return new Response(currentCondition.siblings.get(currentConditionIndex + 1));
+                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
+            }
+            else return new Response(false);
+        }
+        // TODO don't think siblings will ever be null
+       /* if (!answer && currentCondition instanceof Or && currentCondition.siblings == null) {
+            return new Response(false);
+        }*/
+        if (!answer && currentCondition instanceof Or) {
+            int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
+            if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
+                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
             }
             else return new Response(false);
         }
@@ -56,7 +80,7 @@ public class Test {
     }
 
     private Condition getMostBasicQuestion() {
-        return this.ors.get(0);
+        return this.ors.get(0).getDeepestDescendant();
     }
 /*
     private static List<Condition> separateOrs(String testString, Condition parent) {
@@ -131,24 +155,36 @@ public class Test {
         String remainingString = testString;
         int numberOfSiblings = StringUtils.countMatches(testString, separator);
         if (numberOfSiblings == 0) {
-            output.add(new Or(trimAndStripParentheses(testString)));
+            if (separator.equals("&&")) {
+                output.add(new And(trimAndStripParentheses(testString)));
+            } else {
+                output.add(new Or(trimAndStripParentheses(testString)));
+            }
         } else {
             for (int orSequence = 1; orSequence <= numberOfSiblings; orSequence++) {
                 int orInd = StringUtils.ordinalIndexOf(testString, separator, orSequence);
                 String segment = remainingString.substring(prevOrIndex, orInd);
                 if (!isWithinParentheses(segment)) {
-                    output.add(new And(trimAndStripParentheses(segment)));
+                    if (separator.equals("&&")) {
+                        output.add(new And(trimAndStripParentheses(segment)));
+                    }
+                    else {
+                        output.add(new Or(trimAndStripParentheses(segment)));
+                    }
                     prevOrIndex = orInd + 2;
                 }
                 if (orSequence == numberOfSiblings) {
-                    output.add(new And(trimAndStripParentheses(remainingString.substring(prevOrIndex))));
+                    if (separator.equals("&&")) {
+                        output.add(new And(trimAndStripParentheses(remainingString.substring(prevOrIndex))));
+                    }
+                    else {
+                        output.add(new Or(trimAndStripParentheses(remainingString.substring(prevOrIndex))));
+                    }
                 }
             }
             output.forEach(condition -> {
                 condition.parent = parent;
-                if (parent != null) {
-                    condition.siblings = parent.children();
-                }
+                condition.siblings = output;
                 if (condition.conditionString.indexOf(otherSeparator) > -1) {
                     if (condition instanceof And) {
                         ((And) condition).ors = separateSiblings(condition.conditionString, condition, otherSeparator);
@@ -187,6 +223,17 @@ public class Test {
                else return ((And) this).ors;
            }
 
+           public boolean hasChildren() {
+               return this.children() != null;
+           }
+
+           public Condition getDeepestDescendant() {
+               Condition condition = this;
+               while (condition.hasChildren()) {
+                   condition = condition.children().get(0);
+               }
+               return condition;
+           }
     }
 
     public static class Or extends Condition {
