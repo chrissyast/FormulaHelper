@@ -82,72 +82,7 @@ public class Test {
     private Condition getMostBasicQuestion() {
         return this.ors.get(0).getDeepestDescendant();
     }
-/*
-    private static List<Condition> separateOrs(String testString, Condition parent) {
-        List<Condition> output = new ArrayList<>();
-        int prevOrIndex = 0;
-        String remainingString = testString;
-        int numberOfOrs = StringUtils.countMatches(testString, "||");
-        if (numberOfOrs == 0) {
-            output.add(new Or(trimAndStripParentheses(testString)));
-        } else {
-            for (int orSequence = 1; orSequence <= numberOfOrs; orSequence++) {
-                int orInd = StringUtils.ordinalIndexOf(testString, "||", orSequence);
-                String segment = remainingString.substring(prevOrIndex, orInd);
-                if (!isWithinParentheses(segment)) {
-                    output.add(new Or(trimAndStripParentheses(segment)));
-                    prevOrIndex = orInd + 2;
-                }
-                if (orSequence == numberOfOrs) {
-                    output.add(new Or(trimAndStripParentheses(remainingString.substring(prevOrIndex))));
-                }
-            }
-            output.forEach(condition -> {
-                ((Or) condition).parent = parent;
-                if (parent != null) {
-                    ((Or) condition).siblings = parent.children();
-                }
-                if (condition.conditionString.indexOf("&&") > -1) {
-                    ((Or) condition).ands = separateAnds(condition.conditionString, condition);
-                }
-            });
-        }
-         return output;
-    }
 
-    private static List<Condition> separateAnds(String testString, Condition parent) {
-        List<Condition> output = new ArrayList<>();
-        int prevOrIndex = 0;
-        String remainingString = testString;
-        int numberOfAnds = StringUtils.countMatches(testString, "&&");
-        if (numberOfAnds == 0) {
-            output.add(new Or(trimAndStripParentheses(testString)));
-        } else {
-            for (int orSequence = 1; orSequence <= numberOfAnds; orSequence++) {
-                int orInd = StringUtils.ordinalIndexOf(testString, "&&", orSequence);
-                String segment = remainingString.substring(prevOrIndex, orInd);
-                if (!isWithinParentheses(segment)) {
-                    output.add(new And(trimAndStripParentheses(segment)));
-                    prevOrIndex = orInd + 2;
-                }
-                if (orSequence == numberOfAnds) {
-                    output.add(new And(trimAndStripParentheses(remainingString.substring(prevOrIndex))));
-                }
-            }
-            output.forEach(condition -> {
-                ((And) condition).parent = parent;
-                if (parent != null) {
-                    ((And) condition).siblings = parent.children();
-                }
-                if (condition.conditionString.indexOf("||") > -1) {
-                    ((And) condition).ors = separateOrs(condition.conditionString, condition);
-
-                }
-            });
-        }
-     return output;
-    }
-*/
     private static List<Condition> separateSiblings(String testString, Condition parent, String separator) {
         String otherSeparator = separator.equals("&&") ? "||" : "&&";
         List<Condition> output = new ArrayList<>();
@@ -155,11 +90,7 @@ public class Test {
         String remainingString = testString;
         int numberOfSiblings = StringUtils.countMatches(testString, separator);
         if (numberOfSiblings == 0) {
-            if (separator.equals("&&")) {
-                output.add(new And(trimAndStripParentheses(testString)));
-            } else {
-                output.add(new Or(trimAndStripParentheses(testString)));
-            }
+            addToOutput(output, trimAndStripParentheses(testString), separator);
         } else {
             for (int orSequence = 1; orSequence <= numberOfSiblings; orSequence++) {
                 int orInd = StringUtils.ordinalIndexOf(testString, separator, orSequence);
@@ -174,12 +105,7 @@ public class Test {
                     prevOrIndex = orInd + 2;
                 }
                 if (orSequence == numberOfSiblings) {
-                    if (separator.equals("&&")) {
-                        output.add(new And(trimAndStripParentheses(remainingString.substring(prevOrIndex))));
-                    }
-                    else {
-                        output.add(new Or(trimAndStripParentheses(remainingString.substring(prevOrIndex))));
-                    }
+                    addToOutput(output, trimAndStripParentheses(remainingString.substring(prevOrIndex)), separator);
                 }
             }
             output.forEach(condition -> {
@@ -195,6 +121,14 @@ public class Test {
             });
         }
      return output;
+    }
+
+    private static void addToOutput(List<Condition> output, String conditionString, String separator) {
+        if (separator.equals("&&")) {
+            output.add(new And(conditionString));
+        } else {
+            output.add(new Or(conditionString));
+        }
     }
 
     private static String trimAndStripParentheses(String string) {
@@ -214,6 +148,7 @@ public class Test {
         public Condition parent;
         public List<Condition> siblings;
 
+            //TODO make this into a better representation of complexity
            public int complexity(){
                return this.conditionString.length();
            }
