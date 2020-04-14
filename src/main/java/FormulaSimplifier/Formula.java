@@ -67,15 +67,16 @@ public class Formula {
         if (noOpeners != noClosers || (verification.mandatory && (noOpeners == 0 || noClosers == 0)) || indexOfOpenersBeforeClosers != -1) {
 
             if (noOpeners != noClosers) {
-                if (abs(noOpeners - noClosers) > 1) {
-                    if (noOpeners > noClosers) {
-                        validationMessage.append("There are " + (noOpeners - noClosers) + " more " + verification.openerNamePlural + " than " + verification.closerNamePlural);
-                    } else validationMessage.append("There are " + (noClosers - noOpeners) + " more " + verification.closerNamePlural + " than " + verification.openerNamePlural + "s\n");
-                } else if (noOpeners > noClosers) {
-                    validationMessage.append("There is one more " + verification.openerName + " than " + verification.closerNamePlural + "\n");
-                } else {
-                    validationMessage.append("There is one more " + verification.closerName + " than " + verification.openerNamePlural + "\n");
-                }
+                int diff = noOpeners - noClosers;
+                int absDiff = abs(diff);
+                String verb = absDiff == 1 ? "is" : "are";
+                String closerNoun = absDiff == 1 ? verification.closerName : verification.closerNamePlural;
+                String openerNoun = absDiff == 1 ? verification.openerName : verification.openerNamePlural;
+                String moreNoun = diff > 0 ? openerNoun : closerNoun;
+                String fewerNoun = diff > 0 ? verification.openerNamePlural : verification.closerNamePlural;
+
+                validationMessage.append("There " + verb + " " + absDiff + " more " + moreNoun + " than " + fewerNoun + "\n");
+
             }
 
             if (verification.mandatory && (noOpeners == 0 || noClosers == 0)) {
