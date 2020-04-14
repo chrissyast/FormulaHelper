@@ -1,7 +1,5 @@
 package FormulaSimplifier;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import static FormulaSimplifier.FormulaCode.*;
+import static FormulaSimplifier.Formula.*;
 
 
 
@@ -20,8 +18,10 @@ public class SimplifierGUI  {
     public static JButton noButton = new JButton("No");
     public static JTextArea textArea = new JTextArea(10, 40);
     public static JPanel yesNoPanel = new JPanel();
+    // TODO implement one button for restart with old formula, one to restart with brand new formula
     public static JButton restartButton = new JButton("Restart");
     public static Frame f = new JFrame("Formula Simplifier");
+    public static Formula formula;
 
     public static void main(String[] args) {
 
@@ -30,35 +30,19 @@ public class SimplifierGUI  {
 
         initialise();
 
-        JPanel questionsAndAnswers  = new JPanel();
-
-
-        textArea.setEditable(true);
-        f.add(BorderLayout.WEST, yesNoPanel);
-        f.add(BorderLayout.CENTER, questionsAndAnswers);
-
-        questionsAndAnswers.add(questionLabel);
-        questionsAndAnswers.add(textArea);
-        questionLabel.setText("What is the formula?");
-
-
-        ActionListener yesListener = new ActionListener() {
+        ActionListener actionListener = new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                handleYesResponse(subFormula);
-            }};
-
-
-            ActionListener noListener = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    handleNoResponse(subFormula);
-                }};
+            public void actionPerformed(ActionEvent actionEvent) {
+                boolean userResponse = actionEvent.getActionCommand().equals("Yes");
+                    formula.handleUserResponse(userResponse);
+            }
+        };
 
         ActionListener restartListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 restart();
+                textArea.setText(formula.getOriginalFormula());
             }
         };
 
@@ -74,10 +58,13 @@ public class SimplifierGUI  {
 
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_ENTER) {
-                    setOriginalFormula(textArea.getText().replace("/n", ""));
-                    analyse(originalFormula);
-
-
+                    formula = new Formula(textArea.getText().replace("/n", ""));
+                    formula.setSubFormula(formula.getOriginalFormula());
+                    if (formula.verify()) {
+                        formula.setupQuestions();
+                        setUIForQuestions();
+                        formula.askQuestion();
+                    }
                 }
             }
             @Override
@@ -87,11 +74,48 @@ public class SimplifierGUI  {
         };
 
         textArea.addKeyListener(keyListener);
-        yesButton.addActionListener(yesListener);
-        noButton.addActionListener(noListener);
+        yesButton.addActionListener(actionListener);
+        noButton.addActionListener(actionListener);
         restartButton.addActionListener(restartListener);
-
         f.setVisible(true);
+    }
+
+    static void returnAnswer(String answer) {
+        questionLabel.setText("The formula will return " + answer);
+        yesNoPanel.add(restartButton);
+        yesButton.setEnabled(false);
+        noButton.setEnabled(false);
+    }
+
+    private static void setUIForQuestions() {
+        textArea.setVisible(false);
+        yesButton.setVisible(true);
+        noButton.setVisible(true);
+        yesButton.setEnabled(true);
+        noButton.setEnabled(true);
+        yesNoPanel.setVisible(true);
+    }
+
+    private static void initialise() {
+        yesButton.setVisible(false);
+        noButton.setVisible(false);
+        yesNoPanel.add(yesButton);
+        yesNoPanel.add(noButton);
+        JPanel questionsAndAnswers  = new JPanel();
+        textArea.setEditable(true);
+        f.add(BorderLayout.WEST, yesNoPanel);
+        f.add(BorderLayout.CENTER, questionsAndAnswers);
+        questionsAndAnswers.add(questionLabel);
+        questionsAndAnswers.add(textArea);
+        questionLabel.setText("What is the formula?");
+    }
+
+    public static void restart() {
+        questionLabel.setText("What is the formula?");
+        questionLabel.setVisible(true);
+        textArea.setText("");
+        textArea.setVisible(true);
+        yesNoPanel.setVisible(false);
 
     }
 
