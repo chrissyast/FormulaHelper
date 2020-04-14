@@ -33,12 +33,8 @@ public class SimplifierGUI  {
         ActionListener actionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (actionEvent.getActionCommand().equals("Yes")) {
-                    formula.handleYesResponse();
-                }
-                if (actionEvent.getActionCommand().equals("No")) {
-                    formula.handleNoResponse();
-                }
+                boolean userResponse = actionEvent.getActionCommand().equals("Yes");
+                    formula.handleUserResponse(userResponse);
             }
         };
 

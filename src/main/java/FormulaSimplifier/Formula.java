@@ -44,33 +44,45 @@ public class Formula {
     }
 
     protected boolean verify() {
-        return checkColonsAndQuestionMarks(originalFormula);
+        return checkColonsAndQuestionMarks(originalFormula) && checkParentheses(originalFormula);
+    }
+
+    public static boolean checkParentheses(String formula) {
+       Verification verification = Verification.PARENTHESES;
+       return checkOpenersAndClosers(formula, verification);
     }
 
     public static boolean checkColonsAndQuestionMarks(String formula) {
+        Verification verification = Verification.QUESTION_COLON;
+        return checkOpenersAndClosers(formula, verification);
+    }
 
-        int i = StringUtils.countMatches(formula, "?");
-        int j = StringUtils.countMatches(formula, ":");
+    public static boolean checkOpenersAndClosers(String formula, Verification verification) {
+        String opener = verification.opener;
+        String closer = verification.closer;
+        int noOpeners = StringUtils.countMatches(formula, opener);
+        int noClosers = StringUtils.countMatches(formula, closer);
+        int indexOfOpenersBeforeClosers = areThereClosersBeforeOpeners(formula, opener, closer);
         StringBuilder validationMessage = new StringBuilder("Please double check your formula: \n");
-        if (i != j || (formula.indexOf(":") < formula.indexOf("?")) || i == 0 || j == 0 || areThereColonsBeforeQuestionMarks(formula)) {
+        if (noOpeners != noClosers || (verification.mandatory && (noOpeners == 0 || noClosers == 0)) || indexOfOpenersBeforeClosers != -1) {
 
-            if (i != j) {
-                if (abs(i - j) > 1) {
-                    if (i > j) {
-                        validationMessage.append("There are " + (i - j) + " more question marks than colons\n");
-                    } else validationMessage.append("There are " + (j - i) + " more question marks than colons\n");
-                } else if (i > j) {
-                    validationMessage.append("There is one more question mark than colons\n");
+            if (noOpeners != noClosers) {
+                if (abs(noOpeners - noClosers) > 1) {
+                    if (noOpeners > noClosers) {
+                        validationMessage.append("There are " + (noOpeners - noClosers) + " more " + verification.openerNamePlural + " than " + verification.closerNamePlural);
+                    } else validationMessage.append("There are " + (noClosers - noOpeners) + " more " + verification.closerNamePlural + " than " + verification.openerNamePlural + "s\n");
+                } else if (noOpeners > noClosers) {
+                    validationMessage.append("There is one more " + verification.openerName + " than " + verification.closerNamePlural + "\n");
                 } else {
-                    validationMessage.append("There is one more colon than question marks\n");
+                    validationMessage.append("There is one more " + verification.closerName + " than " + verification.openerNamePlural + "\n");
                 }
             }
 
-            if (i == 0 || j == 0) {
-                validationMessage.append("Formula should contain at least 1 colon and 1 question mark.\n");
+            if (verification.mandatory && (noOpeners == 0 || noClosers == 0)) {
+                validationMessage.append("Formula should contain at least 1 " + verification.openerName + " and 1 " + verification.closerName + ".\n");
             }
-            if ((i == j) && areThereColonsBeforeQuestionMarks(formula)) {
-                validationMessage.append("Colon " + i + " comes before question mark " + i + ".\n");
+            if (indexOfOpenersBeforeClosers != -1) {
+                validationMessage.append(capitalise(verification.closerName) + " " + indexOfOpenersBeforeClosers + " comes before " + verification.openerName + " " + indexOfOpenersBeforeClosers + ".\n");
             }
 
             JOptionPane.showMessageDialog(f, validationMessage.toString());
@@ -78,25 +90,13 @@ public class Formula {
         }
         return true;
     }
-    // TODO refactor Yes and No responses into single method
-    void handleYesResponse() {
-        Test.Response response = this.subClause.test.answerQuestion(true, this.subClause.test.currentCondition);
-        if (response.resolvedOutcome != null) {
-            int i = StringUtils.countMatches(subClause.truePart, "?");
-            if (i > 0) {
-                setSubFormula(subClause.truePart);
-                askQuestion();
-            } else {
-            returnAnswer(subClause.truePart);
-            }
-        } else {
-            this.subClause.test.currentCondition = response.newQuestion;
-            askQuestion(response.newQuestion.conditionString);
-        }
+
+    static String capitalise(String string) {
+        return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 
-    void handleNoResponse() {
-        Test.Response response = this.subClause.test.answerQuestion(false, this.subClause.test.currentCondition);
+    void handleUserResponse(Boolean userResponse) {
+        Test.Response response = this.subClause.test.answerQuestion(userResponse, this.subClause.test.currentCondition);
         if (response.resolvedOutcome != null) {
             String returnedPart = response.resolvedOutcome ? subClause.truePart : subClause.falsePart;
             int i = StringUtils.countMatches(returnedPart, "?");
@@ -135,17 +135,17 @@ public class Formula {
     }
 
 
-    public static boolean areThereColonsBeforeQuestionMarks(String formula) {
-        int questionMarkCount = StringUtils.countMatches(formula, "?");
+    public static int areThereClosersBeforeOpeners(String formula, String opener, String closer) {
+        int questionMarkCount = StringUtils.countMatches(formula, opener);
         int i = 0;
 
         while (i <= questionMarkCount) {
-            if (StringUtils.ordinalIndexOf(formula, ":", i) < StringUtils.ordinalIndexOf(formula, "?", i)) {
-                return true;
+            if (StringUtils.ordinalIndexOf(formula, closer, i) < StringUtils.ordinalIndexOf(formula, opener, i)) {
+                return i;
             }
             i++;
         }
-        return false;
+        return -1;
     }
 
     public static String findTrue(String formula) {
