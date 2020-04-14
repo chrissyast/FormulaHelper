@@ -3,25 +3,49 @@ package FormulaSimplifier;
 import java.util.List;
 
 public class Condition {
-    public String conditionString;
-    public Condition parent;
-    public List<Condition> siblings;
+    private String conditionString;
+    private Condition parent;
+    private List<Condition> siblings;
+
+    Condition getParent() {
+        return parent;
+    }
+
+    void setParent(Condition parent) {
+        this.parent = parent;
+    }
+
+    List<Condition> getSiblings() {
+        return siblings;
+    }
+
+    void setSiblings(List<Condition> siblings) {
+        this.siblings = siblings;
+    }
+
+    String getConditionString() {
+        return conditionString;
+    }
+
+    void setConditionString(String conditionString) {
+        this.conditionString = conditionString;
+    }
 
     //TODO make this into a better representation of complexity
-    public int complexity(){
+    int complexity(){
        return this.conditionString.length();
     }
 
-    public List<Condition> children() {
+    private List<Condition> children() {
            if (this instanceof Or) {return ((Or) this).ands;}
            else return ((And) this).ors;
     }
 
-    public boolean hasChildren() {
+    private boolean hasChildren() {
        return this.children() != null;
     }
 
-    public Condition getDeepestDescendant() {
+    Condition getDeepestDescendant() {
            Condition condition = this;
            while (condition.hasChildren()) {
                condition = condition.children().get(0);
@@ -29,28 +53,19 @@ public class Condition {
            return condition;
     }
 
-    public static class Or extends Condition {
+    static class Or extends Condition {
         List<Condition> ands;
 
-        public Or(String conditionString) {
-            this.conditionString = conditionString;
+        Or(String conditionString) {
+            setConditionString(conditionString);
         }
-
-        public Or(List<Condition> ands) {
-            this.ands = ands;
-        }
-
     }
 
-    public static class And extends Condition {
+    static class And extends Condition {
         List<Condition> ors;
 
-        public And(List<Condition> ors) {
-            this.ors = ors;
-        }
-
-        public And(String conditionString) {
-            this.conditionString = conditionString;
+        And(String conditionString) {
+            setConditionString(conditionString);
         }
     }
 }

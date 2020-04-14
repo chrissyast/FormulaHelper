@@ -59,7 +59,7 @@ public class SimplifierGUI  {
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_ENTER) {
                     formula = new Formula(textArea.getText().replace("/n", ""));
-                    subFormula = formula.getOriginalFormula();
+                    formula.setSubFormula(formula.getOriginalFormula());
                     if (formula.verify()) {
                         formula.setupQuestions();
                         setUIForQuestions();
@@ -74,11 +74,8 @@ public class SimplifierGUI  {
         };
 
         textArea.addKeyListener(keyListener);
-      //  yesButton.addActionListener(yesListener);
         yesButton.addActionListener(actionListener);
-      //  noButton.addActionListener(noListener);
         noButton.addActionListener(actionListener);
-      //  restartButton.addActionListener(restartListener);
         restartButton.addActionListener(restartListener);
         f.setVisible(true);
     }
@@ -99,7 +96,7 @@ public class SimplifierGUI  {
         yesNoPanel.setVisible(true);
     }
 
-    public static void initialise() {
+    private static void initialise() {
         yesButton.setVisible(false);
         noButton.setVisible(false);
         yesNoPanel.add(yesButton);

@@ -7,8 +7,8 @@ import java.util.List;
 
 public class Test {
 
-    List<Condition> ors;
-    Condition currentCondition;
+    private List<Condition> ors;
+    private Condition currentCondition;
 
     public Test(List<Condition> ors) {
         this.ors = ors;
@@ -20,17 +20,17 @@ public class Test {
             return a1.complexity() - a2.complexity();
         });
         this.ors.forEach(o -> {
-            o.siblings = this.ors;
+            o.setSiblings(this.ors);
         });
         this.currentCondition = getMostBasicQuestion();
     }
 
-    public Response answerQuestion(boolean answer, Condition currentCondition) {
+    Response answerQuestion(boolean answer, Condition currentCondition) {
 
         if (answer && currentCondition instanceof Condition.Or) {
-            if (currentCondition.parent != null) {
-                int parentIndex = currentCondition.parent.siblings.indexOf(currentCondition.parent);
-                List<Condition> parentSiblings = currentCondition.parent.siblings;
+            if (currentCondition.getParent() != null) {
+                int parentIndex = currentCondition.getParent().getSiblings().indexOf(currentCondition.getParent());
+                List<Condition> parentSiblings = currentCondition.getParent().getSiblings();
                 if (parentIndex + 1 < parentSiblings.size()) {
                     return new Response(parentSiblings.get(parentIndex + 1).getDeepestDescendant());
                 }
@@ -39,24 +39,24 @@ public class Test {
         }
 
         if (!answer && currentCondition instanceof Condition.Or) {
-            int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
-            if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
-                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
+            int currentConditionIndex = currentCondition.getSiblings().indexOf(currentCondition);
+            if (currentConditionIndex + 1 < currentCondition.getSiblings().size()) {
+                return new Response(currentCondition.getSiblings().get(currentConditionIndex + 1).getDeepestDescendant());
             }
             return new Response(false);
         }
 
         if (answer && currentCondition instanceof Condition.And) {
-            int currentConditionIndex = currentCondition.siblings.indexOf(currentCondition);
-            if (currentConditionIndex + 1 < currentCondition.siblings.size()) {
-                return new Response(currentCondition.siblings.get(currentConditionIndex + 1).getDeepestDescendant());
+            int currentConditionIndex = currentCondition.getSiblings().indexOf(currentCondition);
+            if (currentConditionIndex + 1 < currentCondition.getSiblings().size()) {
+                return new Response(currentCondition.getSiblings().get(currentConditionIndex + 1).getDeepestDescendant());
             }
             return new Response(true);
         }
 
         if (!answer && currentCondition instanceof Condition.And) {
-            int parentIndex = currentCondition.parent.siblings.indexOf(currentCondition.parent);
-            List<Condition> parentSiblings = currentCondition.parent.siblings;
+            List<Condition> parentSiblings = currentCondition.getParent().getSiblings();
+            int parentIndex = parentSiblings.indexOf(currentCondition.getParent());
             if (parentIndex + 1 < parentSiblings.size()) {
                 return new Response(parentSiblings.get(parentIndex + 1).getDeepestDescendant());
             }
@@ -96,13 +96,13 @@ public class Test {
                 }
             }
             output.forEach(condition -> {
-                condition.parent = parent;
-                condition.siblings = output;
-                if (condition.conditionString.indexOf(otherSeparator) > -1) {
+                condition.setParent(parent);
+                condition.setSiblings(output);
+                if (condition.getConditionString().contains(otherSeparator)) {
                     if (condition instanceof Condition.And) {
-                        ((Condition.And) condition).ors = separateSiblings(condition.conditionString, condition, otherSeparator);
+                        ((Condition.And) condition).ors = separateSiblings(condition.getConditionString(), condition, otherSeparator);
                     } else {
-                        ((Condition.Or) condition).ands = separateSiblings(condition.conditionString, condition, otherSeparator);
+                        ((Condition.Or) condition).ands = separateSiblings(condition.getConditionString(), condition, otherSeparator);
                     }
                 }
             });
@@ -130,16 +130,40 @@ public class Test {
         return StringUtils.countMatches(string, "(") > StringUtils.countMatches(string, ")");
     }
 
-    public static class Response {
-        Boolean resolvedOutcome;
-        Condition newQuestion;
+    Condition getCurrentCondition() {
+        return currentCondition;
+    }
 
-        public Response(Condition newQuestion) {
+    void setCurrentCondition(Condition currentCondition) {
+        this.currentCondition = currentCondition;
+    }
+
+    static class Response {
+        private Boolean resolvedOutcome;
+        private Condition newQuestion;
+
+        Response(Condition newQuestion) {
             this.newQuestion = newQuestion;
         }
 
-        public Response(boolean resolvedOutcome) {
+        Response(boolean resolvedOutcome) {
             this.resolvedOutcome = resolvedOutcome;
+        }
+
+        public Boolean getResolvedOutcome() {
+            return resolvedOutcome;
+        }
+
+        public void setResolvedOutcome(Boolean resolvedOutcome) {
+            this.resolvedOutcome = resolvedOutcome;
+        }
+
+        public Condition getNewQuestion() {
+            return newQuestion;
+        }
+
+        public void setNewQuestion(Condition newQuestion) {
+            this.newQuestion = newQuestion;
         }
     }
 }

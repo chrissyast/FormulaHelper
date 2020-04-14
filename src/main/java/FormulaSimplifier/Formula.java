@@ -12,13 +12,11 @@ import static java.lang.Math.abs;
 public class Formula {
 
     private String originalFormula;
-    public static String subFormula;
+    private static String subFormula;
     private SubClause subClause;
-    public static String[] questions;
-    public static boolean resolved;
-    public static String TRUE_FALSE_SEPARATOR = "<-TRUEFALSE->";
+    private static String TRUE_FALSE_SEPARATOR = "<-TRUEFALSE->";
 
-    public Formula(String originalFormula) {
+    Formula(String originalFormula) {
         this.originalFormula = originalFormula;
     }
 
@@ -31,38 +29,34 @@ public class Formula {
         setupQuestions();
     }
 
-    public static String[] getQuestions() {
-        return questions;
-    }
-
-    public String getOriginalFormula() {
+    String getOriginalFormula() {
         return originalFormula;
     }
 
-    void setOriginalFormula(String originalFormula) {
+    public void setOriginalFormula(String originalFormula) {
         this.originalFormula = originalFormula;
     }
 
-    protected boolean verify() {
+    boolean verify() {
         return checkColonsAndQuestionMarks(originalFormula) && checkParentheses(originalFormula);
     }
 
-    public static boolean checkParentheses(String formula) {
+    private static boolean checkParentheses(String formula) {
        Verification verification = Verification.PARENTHESES;
        return checkOpenersAndClosers(formula, verification);
     }
 
-    public static boolean checkColonsAndQuestionMarks(String formula) {
+    private static boolean checkColonsAndQuestionMarks(String formula) {
         Verification verification = Verification.QUESTION_COLON;
         return checkOpenersAndClosers(formula, verification);
     }
 
-    public static boolean checkOpenersAndClosers(String formula, Verification verification) {
+    private static boolean checkOpenersAndClosers(String formula, Verification verification) {
         String opener = verification.opener;
         String closer = verification.closer;
         int noOpeners = StringUtils.countMatches(formula, opener);
         int noClosers = StringUtils.countMatches(formula, closer);
-        int indexOfOpenersBeforeClosers = areThereClosersBeforeOpeners(formula, opener, closer);
+        int indexOfOpenersBeforeClosers = closerBeforeOpener(formula, opener, closer);
         StringBuilder validationMessage = new StringBuilder("Please double check your formula: \n");
         if (noOpeners != noClosers || (verification.mandatory && (noOpeners == 0 || noClosers == 0)) || indexOfOpenersBeforeClosers != -1) {
 
@@ -92,14 +86,14 @@ public class Formula {
         return true;
     }
 
-    static String capitalise(String string) {
+    private static String capitalise(String string) {
         return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 
     void handleUserResponse(Boolean userResponse) {
-        Test.Response response = this.subClause.test.answerQuestion(userResponse, this.subClause.test.currentCondition);
-        if (response.resolvedOutcome != null) {
-            String returnedPart = response.resolvedOutcome ? subClause.truePart : subClause.falsePart;
+        Test.Response response = this.subClause.test.answerQuestion(userResponse, this.subClause.test.getCurrentCondition());
+        if (response.getResolvedOutcome() != null) {
+            String returnedPart = response.getResolvedOutcome() ? subClause.truePart : subClause.falsePart;
             int i = StringUtils.countMatches(returnedPart, "?");
             if (i > 0) {
                 setSubFormula(returnedPart);
@@ -108,12 +102,12 @@ public class Formula {
             returnAnswer(returnedPart);
             }
         } else {
-            this.subClause.test.currentCondition = response.newQuestion;
-            askQuestion(response.newQuestion.conditionString);
+            this.subClause.test.setCurrentCondition(response.getNewQuestion());
+            askQuestion();
         }
     }
 
-    public static String splitTrueFalse(String formula) {
+    private static String splitTrueFalse(String formula) {
         int colonOrder = 1;
         int colonInd = StringUtils.ordinalIndexOf(formula, ":", colonOrder);
         String toColon = formula.substring(0, colonInd + 1);
@@ -136,7 +130,7 @@ public class Formula {
     }
 
 
-    public static int areThereClosersBeforeOpeners(String formula, String opener, String closer) {
+    private static int closerBeforeOpener(String formula, String opener, String closer) {
         int questionMarkCount = StringUtils.countMatches(formula, opener);
         int i = 0;
 
@@ -149,29 +143,17 @@ public class Formula {
         return -1;
     }
 
-    public static String findTrue(String formula) {
-
+    private static String findTrue(String formula) {
         String tfOut = splitTrueFalse(formula);
         int end = tfOut.indexOf(TRUE_FALSE_SEPARATOR);
-        int start = tfOut.indexOf("?");
-        String truePath = "";
-
-        if (start == -1) {
-            truePath = tfOut.substring(0, end);
-
-        } else {
-            truePath = tfOut.substring(0, end);
-        }
-        return truePath;
-
+        return tfOut.substring(0, end);
     }
 
 
-    public String findFalse(String formula) {
+    private String findFalse(String formula) {
         String tfOut = splitTrueFalse(formula);
         int start = tfOut.indexOf(TRUE_FALSE_SEPARATOR) + (TRUE_FALSE_SEPARATOR).length();
-        String falsePath = tfOut.substring(start);
-        return falsePath;
+        return tfOut.substring(start);
     }
 
 
@@ -179,20 +161,15 @@ public class Formula {
         int s = 0;
         int questMarkInd = 1;
         int x = StringUtils.ordinalIndexOf(formula, "?", questMarkInd);
-        String question = formula.substring(s, x);
-        return (question);
+        return (formula.substring(s, x));
     }
 
     // TODO move into GUI ?
     protected void askQuestion() {
-        questionLabel.setText("Is " + subClause.test.currentCondition.conditionString + " true?");
+        questionLabel.setText("Is " + subClause.test.getCurrentCondition().getConditionString() + " true?");
     }
 
-    protected void askQuestion(String question) {
-        questionLabel.setText("Is " + question + " true?");
-    }
-
-    public void setupQuestions() {
+    void setupQuestions() {
         this.subClause = new SubClause(findQuestion(subFormula), findTrue(subFormula), findFalse(subFormula));
     }
 
@@ -201,7 +178,7 @@ public class Formula {
         private String truePart;
         private String falsePart;
 
-        public SubClause(String conditionString, String truePart, String falsePart) {
+        SubClause(String conditionString, String truePart, String falsePart) {
             this.test = new Test(conditionString);
             this.truePart = truePart;
             this.falsePart = falsePart;
