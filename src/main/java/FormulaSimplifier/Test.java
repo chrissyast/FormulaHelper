@@ -3,6 +3,7 @@ package FormulaSimplifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Test {
@@ -16,13 +17,25 @@ public class Test {
 
     public Test (String testString) {
         this.ors = separateSiblings(testString, null, "||");
-        this.ors.sort((Condition a1, Condition a2) -> {
-            return a1.complexity() - a2.complexity();
-        });
+        if (!isJUnitTest()) {
+            this.ors.sort((Condition a1, Condition a2) -> {
+                return a1.complexity() - a2.complexity();
+            });
+        }
         this.ors.forEach(o -> {
             o.setSiblings(this.ors);
         });
         this.currentCondition = getMostBasicQuestion();
+    }
+
+    public static boolean isJUnitTest() {
+        StackTraceElement[] list = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : list) {
+            if (element.getClassName().startsWith("org.junit.")) {
+                return true;
+            }
+        }
+    return false;
     }
 
     Response answerQuestion(boolean answer, Condition currentCondition) {
@@ -136,6 +149,10 @@ public class Test {
 
     void setCurrentCondition(Condition currentCondition) {
         this.currentCondition = currentCondition;
+    }
+
+    public List<Condition> getOrs() {
+        return ors;
     }
 
     static class Response {

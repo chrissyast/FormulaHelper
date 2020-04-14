@@ -33,7 +33,17 @@ public class Condition {
 
     //TODO make this into a better representation of complexity
     int complexity(){
-       return this.conditionString.length();
+        int comp =  this.parent == null ? 1 : 0;
+        if (!this.hasChildren()) return comp;
+        comp++;
+        comp += this.children().stream().mapToInt(condition -> {
+                if (condition.hasChildren()) {
+                 return condition.children().size();
+                }
+                return 0;
+            }).sum();
+        comp += this.children().stream().mapToInt(Condition::complexity).sum();
+        return comp;
     }
 
     private List<Condition> children() {
