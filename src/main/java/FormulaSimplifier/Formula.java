@@ -67,7 +67,7 @@ public class Formula {
                 String closerNoun = absDiff == 1 ? verification.closerName : verification.closerNamePlural;
                 String openerNoun = absDiff == 1 ? verification.openerName : verification.openerNamePlural;
                 String moreNoun = diff > 0 ? openerNoun : closerNoun;
-                String fewerNoun = diff > 0 ? verification.openerNamePlural : verification.closerNamePlural;
+                String fewerNoun = diff > 0 ? verification.closerNamePlural : verification.openerNamePlural;
 
                 validationMessage.append("There " + verb + " " + absDiff + " more " + moreNoun + " than " + fewerNoun + "\n");
 
