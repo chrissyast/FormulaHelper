@@ -1,1 +1,0 @@
-java -jar dist/JavaApplication1.jar
