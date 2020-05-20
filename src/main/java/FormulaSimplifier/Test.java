@@ -56,11 +56,13 @@ public class Test {
             if (currentConditionIndex + 1 < currentCondition.getSiblings().size()) {
                 return new Response(currentCondition.getSiblings().get(currentConditionIndex + 1).getDeepestDescendant());
             }
-            Condition grandparent = currentCondition.getParent().getParent();
-            List<Condition> grandparentSiblings = grandparent.getSiblings();
-            int grandparentIndex = grandparentSiblings.indexOf(grandparent);
-            if (grandparentIndex + 1 < grandparentSiblings.size()) {
-                return new Response(grandparentSiblings.get(grandparentIndex + 1).getDeepestDescendant());
+            if (currentCondition.getParent() != null && currentCondition.getParent().getParent() != null) {
+                Condition grandparent = currentCondition.getParent().getParent();
+                List<Condition> grandparentSiblings = grandparent.getSiblings();
+                int grandparentIndex = grandparentSiblings.indexOf(grandparent);
+                if (grandparentIndex + 1 < grandparentSiblings.size()) {
+                    return new Response(grandparentSiblings.get(grandparentIndex + 1).getDeepestDescendant());
+                }
             }
             return new Response(false);
         }

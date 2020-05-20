@@ -59,8 +59,8 @@ public class SimplifierGUI  {
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_ENTER) {
                     formula = new Formula(textArea.getText().replace("/n", ""));
-                    formula.setSubFormula(formula.getOriginalFormula());
                     if (formula.verify()) {
+                        formula.setSubFormula(formula.getOriginalFormula());
                         formula.setupQuestions();
                         setUIForQuestions();
                         formula.askQuestion();
