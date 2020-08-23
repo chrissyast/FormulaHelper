@@ -9,3 +9,9 @@ The program will offer some basic linting on the formula - checking that open an
 If the formula passes validation, it will then be broken down into a series of true/false questions designed to guide you to the eventual output of your formula for the given conditions.
 
 
+
+Dev - run in IntelliJ 
+
+Sometimes get an error about language level.
+
+Fix with `File | Settings | Build, Execution, Deployment | Compiler | Java Compiler -> Same as language level`
